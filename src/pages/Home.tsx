@@ -15,7 +15,7 @@ export const HomePage: FC<HomePageProps> = () => {
 
   const images = Array.from(
     { length: 9 },
-    (_, i) => `src/assets/carosel/img${i + 1}.png`
+    (_, i) => `/carosel/img${i + 1}.png`
   );
 
   // Duplicate images for infinite scroll effect

@@ -171,7 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {/* <h2 className="text-lg font-semibold bg-red-500">Menu</h2> */}
               <div className="w-full h-full flex items-center justify-center">
                 <img
-                  src="src\assets\tiger_long.png"
+                  src="/tiger_long.png"
                   alt="Logo Long"
                   className="h-full w-auto bg-none"
                 />
@@ -199,7 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <img
-                src="src/assets/tiger_sm.png"
+                src="/tiger_sm.png"
                 alt="Logo"
                 className="w-full h-full object-contain"
               />
