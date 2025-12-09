@@ -39,7 +39,7 @@ jobs:
         run: npm ci
       - name: Build
         env:
-          NODE_ENV: production
+          NODE_ENV: ${{ secrets.NODE_ENV }}
         run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
