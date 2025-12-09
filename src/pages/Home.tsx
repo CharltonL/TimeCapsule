@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 import Carousel from "../components/Carousel";
 
 export interface HomePageProps {}

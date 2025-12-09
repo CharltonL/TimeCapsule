@@ -1,5 +1,5 @@
 import React, { type JSX } from "react";
-import { useLocation, Link } from "react-router";
+import { useLocation, Link } from "react-router-dom";
 
 interface SidebarItem {
   path: string;
