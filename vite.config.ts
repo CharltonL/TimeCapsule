@@ -7,5 +7,5 @@ const NODE_ENV = process.env.NODE_ENV;
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: NODE_ENV == "production" ? "/TimeCapsule/" : "",
+  base: NODE_ENV == "production" ? "/TimeCapsule/" : "/",
 });

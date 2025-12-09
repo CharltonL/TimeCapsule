@@ -5,8 +5,10 @@ import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { Router } from "./Router.tsx";
 
+const basename = import.meta.env.MODE === "production" ? "/TimeCapsule" : "/";
+
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter basename="/TimeCapsule">
+  <BrowserRouter basename={basename}>
     <StrictMode>
       <Router />
     </StrictMode>

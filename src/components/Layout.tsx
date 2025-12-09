@@ -5,6 +5,8 @@ import Sidebar from "./Sidebar";
 
 export const Layout: React.FC = () => {
   const mainContainerRef = useRef<HTMLDivElement>(null);
+
+  // Initialize sidebar state from localStorage, default to true (open)
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -22,10 +24,10 @@ export const Layout: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen w-screen overflow-hidden">
       <Sidebar drawerOpen={drawerOpen} toggleDrawer={toggleDrawer} />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <Header drawerOpen={drawerOpen} toggleDrawer={toggleDrawer} />
 
         <main ref={mainContainerRef} className="flex-1 overflow-y-auto">

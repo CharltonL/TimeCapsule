@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ drawerOpen, toggleDrawer }) => {
           aria-label="Toggle sidebar"
         >
           <svg
-            className="w-6 h-6 "
+            className="w-6 h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
