@@ -7,7 +7,7 @@ export interface HomePageProps {}
 export const HomePage: FC<HomePageProps> = () => {
   const images = Array.from(
     { length: 9 },
-    (_, i) => `/carosel/img${i + 1}.png`
+    (_, i) => `${import.meta.env.BASE_URL}carosel/img${i + 1}.png`
   );
 
   const allImages = [...images, ...images, ...images];
