@@ -61,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="w-full flex items-center justify-between h-full">
               <div className="w-full h-full flex items-center justify-center">
                 <img
-                  src={`/tiger_long.png`}
+                  src={`${import.meta.env.BASE_URL}tiger_long.png`}
                   alt="Logo Long"
                   className="h-full w-auto bg-none"
                 />
@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <img
-                src={`/tiger_sm.png`}
+                src={`${import.meta.env.BASE_URL}tiger_sm.png`}
                 alt="Logo"
                 className="w-full h-full object-contain"
               />
