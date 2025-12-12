@@ -1,9 +1,7 @@
 import type { FC } from "react";
 import Carousel from "../components/Carousel";
 
-export interface HomePageProps {}
-
-export const HomePage: FC<HomePageProps> = () => {
+export const HomePage: FC = () => {
   const imageModules = import.meta.glob(
     "/public/images/**/*.(png|jpg|jpeg|gif|webp)",
     { eager: true, as: "url" }

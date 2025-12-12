@@ -1,6 +1,12 @@
 import React, { type JSX } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { GLOBE_ICON, MAP_ICON, GALLERY_ICON, HOME_ICON } from "./Icons";
+import {
+  GLOBE_ICON,
+  MAP_ICON,
+  GALLERY_ICON,
+  HOME_ICON,
+  NEWSPAPER_ICON,
+} from "./Icons";
 
 interface SidebarItem {
   path: string;
@@ -28,6 +34,11 @@ const sidebarItems: SidebarItem[] = [
     path: "/360",
     label: "360 Images",
     icon: GLOBE_ICON,
+  },
+  {
+    path: "/notes",
+    label: "Notes From the Authors",
+    icon: NEWSPAPER_ICON,
   },
 ];
 

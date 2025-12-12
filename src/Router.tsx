@@ -5,6 +5,7 @@ import { Layout } from "./components/Layout";
 import MapExample from "./pages/Map";
 import { Gallery } from "./pages/Gallery";
 import { BuildingPage } from "./pages/BuildingPage";
+import { NotesPage } from "./pages/Notes";
 
 export const Router = () => (
   <Routes>
@@ -13,6 +14,7 @@ export const Router = () => (
       <Route path="gallery" element={<Gallery />} />
       <Route path="map" element={<MapExample />} />
       <Route path="360" element={<TestPage2 />} />
+      <Route path="notes" element={<NotesPage />} />
       <Route path="building/:buildingId" element={<BuildingPage />} />
     </Route>
   </Routes>

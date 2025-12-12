@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 type FilterType = "all" | "buildings" | "interviews";
 type SortOrderType = "alphabetically" | "randomly";
-type ViewModeType = "full";
 
 interface BuildingItem {
   id: string;
@@ -28,12 +27,9 @@ interface InterviewItem {
 
 type GalleryItem = BuildingItem | InterviewItem;
 
-export interface GalleryProps {}
-
-export const Gallery: FC<GalleryProps> = () => {
+export const Gallery: FC = () => {
   const [filter, setFilter] = useState<FilterType>("all");
   const [sortOrder, setSortOrder] = useState<SortOrderType>("alphabetically");
-  const [viewMode, setViewMode] = useState<ViewModeType>("full");
   const [randomSeed, setRandomSeed] = useState<number>(0);
   const [isShuffling, setIsShuffling] = useState<boolean>(false);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
@@ -243,19 +239,6 @@ export const Gallery: FC<GalleryProps> = () => {
             onClick={() => setFilter("interviews")}
           >
             INTERVIEWS
-          </button>
-        </div>
-
-        <div className="flex gap-6">
-          <button
-            className={`bg-transparent border-none font-mono text-sm font-semibold tracking-wider cursor-pointer transition-all duration-300 py-2 px-0 relative ${
-              viewMode === "full"
-                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f]'
-                : "text-white/50 hover:text-white/90"
-            }`}
-            onClick={() => setViewMode("full")}
-          >
-            FULL VIEW
           </button>
         </div>
 

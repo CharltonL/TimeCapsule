@@ -3,9 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { FC } from "react";
 import OSMap from "../components/OSMap";
 
-interface BuildingPageProps {}
-
-export const BuildingPage: FC<BuildingPageProps> = () => {
+export const BuildingPage: FC = () => {
   const { buildingId } = useParams<{ buildingId: string }>();
   const navigate = useNavigate();
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
