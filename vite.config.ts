@@ -8,4 +8,12 @@ const NODE_ENV = process.env.NODE_ENV;
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: NODE_ENV == "production" ? "/TimeCapsule/" : "/",
+  build: {
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
 });
