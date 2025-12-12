@@ -19,14 +19,11 @@ export const BuildingPage: FC<BuildingPageProps> = () => {
   const buildingImages = useMemo(() => {
     if (!buildingId) return [];
 
-    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-
     const images: string[] = [];
     Object.entries(imageModules).forEach(([path, url]) => {
       const match = path.match(/\/images\/([^/]+)\//);
       if (match && match[1] === buildingId) {
-        const cleanUrl = url.toString().replace(/^\//, "");
-        images.push(`${base}${cleanUrl}`);
+        images.push(url as string);
       }
     });
     return images.sort(() => Math.random() - 0.5);

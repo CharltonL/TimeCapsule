@@ -93,16 +93,14 @@ export const Gallery: FC<GalleryProps> = () => {
 
   const buildingData = useMemo<BuildingItem[]>(() => {
     const buildings: Record<string, string[]> = {};
-    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 
     Object.entries(imageModules).forEach(([path, url]) => {
-      const match = path.match(/\/images\/([^/]+)\//);
+      const match = path.match(/\/images\/([^/]+)\//); // or /pictures/ if that's your folder
       if (match) {
         const buildingName = match[1];
         if (!buildings[buildingName]) buildings[buildingName] = [];
 
-        const cleanUrl = url.toString().replace(/^\//, "");
-        buildings[buildingName].push(`${base}${cleanUrl}`);
+        buildings[buildingName].push(url as string);
       }
     });
 
@@ -121,8 +119,6 @@ export const Gallery: FC<GalleryProps> = () => {
   }, [randomSeed, buildingCoordinates]);
 
   const interviewData = useMemo<InterviewItem[]>(() => {
-    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-
     return Object.entries(interviewModules).map(([path, url], index) => {
       const filename =
         path
@@ -130,14 +126,14 @@ export const Gallery: FC<GalleryProps> = () => {
           .pop()
           ?.replace(/\.[^/.]+$/, "") ?? "";
       const isVideo = /\.(mp4|webm|mov)$/i.test(path);
-      const cleanUrl = url.toString().replace(/^\//, "");
-      const fullUrl = `${base}${cleanUrl}`;
+
+      const fullUrl = url as string;
 
       return {
         id: `interview-${index}`,
         name: filename.replace(/-|_/g, " "),
         type: "interview" as const,
-        mediaType: isVideo ? "video" : "audio",
+        mediaType: (isVideo ? "video" : "audio") as "video" | "audio",
         path: fullUrl,
         thumbnail: isVideo ? fullUrl : null,
       };

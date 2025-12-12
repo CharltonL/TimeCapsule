@@ -26,23 +26,21 @@ export default function MapExample() {
     const loadBuildingsForMap = async () => {
       setIsLoading(true);
 
-      const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
       const buildings: Record<string, string[]> = {};
 
       Object.entries(imageModules).forEach(([path, url]) => {
         const match = path.match(/\/images\/([^/]+)\//);
         if (match) {
           const buildingName = match[1];
-          if (!buildings[buildingName]) {
-            buildings[buildingName] = [];
-          }
+          if (!buildings[buildingName]) buildings[buildingName] = [];
 
-          const cleanUrl = url.toString().replace(/^\//, "");
-          buildings[buildingName].push(`${base}${cleanUrl}`);
+          buildings[buildingName].push(url as string);
         }
       });
 
       const points: BuildingPoint[] = [];
+
+      const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 
       for (const [buildingName, images] of Object.entries(buildings)) {
         try {
