@@ -19,22 +19,26 @@ export default function MapExample() {
 
   const imageModules = import.meta.glob(
     "/public/images/**/*.(png|jpg|jpeg|gif|webp)",
-    { eager: true }
+    { eager: true, as: "url" }
   );
 
   useEffect(() => {
     const loadBuildingsForMap = async () => {
       setIsLoading(true);
+
+      const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
       const buildings: Record<string, string[]> = {};
 
-      Object.keys(imageModules).forEach((path) => {
-        const match = path.match(/\/images\/([^\/]+)\//);
+      Object.entries(imageModules).forEach(([path, url]) => {
+        const match = path.match(/\/images\/([^/]+)\//);
         if (match) {
           const buildingName = match[1];
           if (!buildings[buildingName]) {
             buildings[buildingName] = [];
           }
-          buildings[buildingName].push(path.replace("/public", ""));
+
+          const cleanUrl = url.toString().replace(/^\//, "");
+          buildings[buildingName].push(`${base}${cleanUrl}`);
         }
       });
 
@@ -42,9 +46,8 @@ export default function MapExample() {
 
       for (const [buildingName, images] of Object.entries(buildings)) {
         try {
-          const response = await fetch(
-            `/images/${buildingName}/coordinates.txt`
-          );
+          const coordUrl = `${base}images/${buildingName}/coordinates.txt`;
+          const response = await fetch(coordUrl);
           if (response.ok) {
             const text = await response.text();
             const [lat, lng] = text.trim().split(",").map(Number);
@@ -75,7 +78,7 @@ export default function MapExample() {
     };
 
     loadBuildingsForMap();
-  }, []);
+  }, [navigate]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>

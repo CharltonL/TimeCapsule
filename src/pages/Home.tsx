@@ -5,16 +5,20 @@ export interface HomePageProps {}
 
 export const HomePage: FC<HomePageProps> = () => {
   const imageModules = import.meta.glob(
-    `${import.meta.env.BASE_URL}images/**/*.(png|jpg|jpeg|gif|webp)`,
-    { eager: true }
+    "/public/images/**/*.(png|jpg|jpeg|gif|webp)",
+    { eager: true, as: "url" }
   );
-  const images = Object.keys(imageModules)
-    .map((path) => path.replace("/public", ""))
+
+  const images = Object.values(imageModules)
+    .map((url) => {
+      // `url` will be something like "/images/xxx.png" in dev and build
+      return `${import.meta.env.BASE_URL}${url.toString().replace(/^\//, "")}`;
+    })
     .sort(() => Math.random() - 0.5);
 
   return (
     <div className="flex flex-col items-center w-full p-5 h-full overflow-hidden">
-      <h1 className={`text-3xl text-white`}>
+      <h1 className="text-3xl text-white">
         The RIT Fall 2025 Time Capsule attempts to preserve RIT as it existed
         during Fall 2025. Through campus photography, interviews, and 360°
         tours, the project captures not just what the campus looked like, but

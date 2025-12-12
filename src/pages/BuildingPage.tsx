@@ -13,26 +13,34 @@ export const BuildingPage: FC<BuildingPageProps> = () => {
 
   const imageModules = import.meta.glob(
     "/public/images/**/*.(png|jpg|jpeg|gif|webp)",
-    { eager: true }
+    { eager: true, as: "url" }
   );
 
   const buildingImages = useMemo(() => {
+    if (!buildingId) return [];
+
+    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+
     const images: string[] = [];
-    Object.keys(imageModules).forEach((path) => {
-      const match = path.match(/\/images\/([^\/]+)\//);
+    Object.entries(imageModules).forEach(([path, url]) => {
+      const match = path.match(/\/images\/([^/]+)\//);
       if (match && match[1] === buildingId) {
-        images.push(path.replace("/public", ""));
+        const cleanUrl = url.toString().replace(/^\//, "");
+        images.push(`${base}${cleanUrl}`);
       }
     });
-    return images;
+    return images.sort(() => Math.random() - 0.5);
   }, [buildingId]);
 
   useEffect(() => {
     const loadCoordinates = async () => {
       if (!buildingId) return;
 
+      const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+      const url = `${base}images/${buildingId}/coordinates.txt`;
+
       try {
-        const response = await fetch(`/images/${buildingId}/coordinates.txt`);
+        const response = await fetch(url);
         if (response.ok) {
           const text = await response.text();
           const [lat, lng] = text.trim().split(",").map(Number);

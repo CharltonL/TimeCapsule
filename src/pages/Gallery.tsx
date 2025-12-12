@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import type { FC } from "react";
 import OSMap from "../components/OSMap";
+import { useNavigate } from "react-router-dom";
 
 type FilterType = "all" | "buildings" | "interviews";
 type SortOrderType = "alphabetically" | "randomly";
@@ -41,121 +42,67 @@ export const Gallery: FC<GalleryProps> = () => {
   const [buildingCoordinates, setBuildingCoordinates] = useState<
     Record<string, [number, number]>
   >({});
+  const navigate = useNavigate();
 
   const styles = `
     @keyframes slideIn {
-      from {
-        transform: scaleX(0);
-      }
-      to {
-        transform: scaleX(1);
-      }
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
     }
-
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes cardAppear {
-      from {
-        opacity: 0;
-        transform: scale(0.95) translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
-
-    .gallery-grid {
-      position: relative;
-    }
+    .gallery-grid { position: relative; }
 
     @keyframes shuffleToCenter {
-      0% {
-        opacity: 1;
-        transform: translate(0, 0) scale(1);
-        filter: blur(0px);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(var(--center-x), var(--center-y)) scale(0.2);
-        filter: blur(4px);
-      }
+      0% { opacity: 1; transform: translate(0, 0) scale(1); filter: blur(0px); }
+      100% { opacity: 0; transform: translate(var(--center-x), var(--center-y)) scale(0.2); filter: blur(4px); }
     }
-
     @keyframes shuffleFromCenter {
-      0% {
-        opacity: 0;
-        transform: translate(var(--center-x), var(--center-y)) scale(0.2);
-        filter: blur(4px);
-      }
-      100% {
-        opacity: 1;
-        transform: translate(0, 0) scale(1);
-        filter: blur(0px);
-      }
+      0% { opacity: 0; transform: translate(var(--center-x), var(--center-y)) scale(0.2); filter: blur(4px); }
+      100% { opacity: 1; transform: translate(0, 0) scale(1); filter: blur(0px); }
     }
 
-    .card-flip-container {
-      perspective: 1000px;
-    }
-
+    .card-flip-container { perspective: 1000px; }
     .card-flip-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s;
-      transform-style: preserve-3d;
+      position: relative; width: 100%; height: 100%;
+      transition: transform 0.6s; transform-style: preserve-3d;
     }
-
-    .card-flip-inner.flipped {
-      transform: rotateY(180deg);
-    }
-
+    .card-flip-inner.flipped { transform: rotateY(180deg); }
     .card-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
+      position: absolute; width: 100%; height: 100%;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
     }
-
-    .card-face-back {
-      transform: rotateY(180deg);
-    }
+    .card-face-back { transform: rotateY(180deg); }
   `;
 
   const imageModules = import.meta.glob(
     "/public/images/**/*.(png|jpg|jpeg|gif|webp)",
-    { eager: true }
+    { eager: true, as: "url" }
   );
 
-  const interviewModules = import.meta.glob(
-    `${import.meta.env.BASE_URL}interviews/*.(mp4|mov)`,
-    {
-      eager: true,
-    }
-  );
+  const interviewModules = import.meta.glob("/public/interviews/*.(mp4|mov)", {
+    eager: true,
+    as: "url",
+  });
 
   const buildingData = useMemo<BuildingItem[]>(() => {
     const buildings: Record<string, string[]> = {};
+    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 
-    Object.keys(imageModules).forEach((path) => {
-      const match = path.match(/\/images\/([^\/]+)\//);
+    Object.entries(imageModules).forEach(([path, url]) => {
+      const match = path.match(/\/images\/([^/]+)\//);
       if (match) {
         const buildingName = match[1];
-        if (!buildings[buildingName]) {
-          buildings[buildingName] = [];
-        }
-        buildings[buildingName].push(path.replace("/public", ""));
+        if (!buildings[buildingName]) buildings[buildingName] = [];
+
+        const cleanUrl = url.toString().replace(/^\//, "");
+        buildings[buildingName].push(`${base}${cleanUrl}`);
       }
     });
 
@@ -174,21 +121,25 @@ export const Gallery: FC<GalleryProps> = () => {
   }, [randomSeed, buildingCoordinates]);
 
   const interviewData = useMemo<InterviewItem[]>(() => {
-    return Object.keys(interviewModules).map((path, index) => {
+    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+
+    return Object.entries(interviewModules).map(([path, url], index) => {
       const filename =
         path
           .split("/")
           .pop()
           ?.replace(/\.[^/.]+$/, "") ?? "";
       const isVideo = /\.(mp4|webm|mov)$/i.test(path);
+      const cleanUrl = url.toString().replace(/^\//, "");
+      const fullUrl = `${base}${cleanUrl}`;
 
       return {
         id: `interview-${index}`,
         name: filename.replace(/-|_/g, " "),
         type: "interview" as const,
-        mediaType: (isVideo ? "video" : "audio") as "video" | "audio",
-        path: path.replace("/public", ""),
-        thumbnail: isVideo ? path.replace("/public", "") : null,
+        mediaType: isVideo ? "video" : "audio",
+        path: fullUrl,
+        thumbnail: isVideo ? fullUrl : null,
       };
     });
   }, []);
@@ -196,16 +147,13 @@ export const Gallery: FC<GalleryProps> = () => {
   const allItems = useMemo<GalleryItem[]>(() => {
     let items: GalleryItem[] = [];
 
-    if (filter === "all" || filter === "buildings") {
-      items = [...items, ...buildingData];
-    }
-    if (filter === "all" || filter === "interviews") {
-      items = [...items, ...interviewData];
-    }
+    if (filter === "all" || filter === "buildings") items.push(...buildingData);
+    if (filter === "all" || filter === "interviews")
+      items.push(...interviewData);
 
     if (sortOrder === "alphabetically") {
       items.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortOrder === "randomly") {
+    } else {
       items.sort(() => Math.random() - 0.5);
     }
 
@@ -218,24 +166,19 @@ export const Gallery: FC<GalleryProps> = () => {
     } else {
       setFlippedCards((prev) => {
         const newSet = new Set(prev);
-        if (newSet.has(item.id)) {
-          newSet.delete(item.id);
-        } else {
-          newSet.add(item.id);
-        }
+        if (newSet.has(item.id)) newSet.delete(item.id);
+        else newSet.add(item.id);
         return newSet;
       });
     }
   };
 
   useEffect(() => {
-    const imagePaths = Object.keys(imageModules).map((path) =>
-      path.replace("/public", "")
-    );
-
-    imagePaths.forEach((imagePath) => {
+    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+    Object.values(imageModules).forEach((url) => {
+      const cleanUrl = url.toString().replace(/^\//, "");
       const img = new Image();
-      img.src = imagePath;
+      img.src = `${base}${cleanUrl}`;
     });
   }, []);
 
@@ -243,19 +186,18 @@ export const Gallery: FC<GalleryProps> = () => {
     const loadCoordinates = async () => {
       const buildings = new Set<string>();
 
-      // Extract unique building names
       Object.keys(imageModules).forEach((path) => {
-        const match = path.match(/\/images\/([^\/]+)\//);
-        if (match) {
-          buildings.add(match[1]);
-        }
+        const match = path.match(/\/images\/([^/]+)\//);
+        if (match) buildings.add(match[1]);
       });
 
       const coordsMap: Record<string, [number, number]> = {};
+      const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 
       for (const building of buildings) {
         try {
-          const response = await fetch(`/images/${building}/coordinates.txt`);
+          const url = `${base}images/${building}/coordinates.txt`;
+          const response = await fetch(url);
           if (response.ok) {
             const text = await response.text();
             const [lat, lng] = text.trim().split(",").map(Number);
@@ -263,9 +205,7 @@ export const Gallery: FC<GalleryProps> = () => {
               coordsMap[building] = [lat, lng];
             }
           }
-        } catch (error) {
-          console.warn(`No coordinates found for ${building}`);
-        }
+        } catch {}
       }
 
       setBuildingCoordinates(coordsMap);
@@ -275,33 +215,35 @@ export const Gallery: FC<GalleryProps> = () => {
   }, []);
 
   return (
-    <div className="min-h-screen  p-8 font-mono">
+    <div className="min-h-screen p-8 font-mono">
       <div className="flex justify-between items-center mb-12 pb-6 border-b border-white/15 flex-wrap gap-4 md:flex-row flex-col md:items-center items-start">
         <div className="flex gap-6">
           <button
             className={`bg-transparent border-none font-mono text-sm font-semibold tracking-wider cursor-pointer transition-all duration-300 py-2 px-0 relative ${
               filter === "all"
-                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f] after:animate-[slideIn_0.3s_ease]'
+                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f]'
                 : "text-white/50 hover:text-white/90"
             }`}
             onClick={() => setFilter("all")}
           >
             ALL
           </button>
+
           <button
             className={`bg-transparent border-none font-mono text-sm font-semibold tracking-wider cursor-pointer transition-all duration-300 py-2 px-0 relative ${
               filter === "buildings"
-                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f] after:animate-[slideIn_0.3s_ease]'
+                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f]'
                 : "text-white/50 hover:text-white/90"
             }`}
             onClick={() => setFilter("buildings")}
           >
             BUILDINGS
           </button>
+
           <button
             className={`bg-transparent border-none font-mono text-sm font-semibold tracking-wider cursor-pointer transition-all duration-300 py-2 px-0 relative ${
               filter === "interviews"
-                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f] after:animate-[slideIn_0.3s_ease]'
+                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f]'
                 : "text-white/50 hover:text-white/90"
             }`}
             onClick={() => setFilter("interviews")}
@@ -314,7 +256,7 @@ export const Gallery: FC<GalleryProps> = () => {
           <button
             className={`bg-transparent border-none font-mono text-sm font-semibold tracking-wider cursor-pointer transition-all duration-300 py-2 px-0 relative ${
               viewMode === "full"
-                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f] after:animate-[slideIn_0.3s_ease]'
+                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f]'
                 : "text-white/50 hover:text-white/90"
             }`}
             onClick={() => setViewMode("full")}
@@ -327,17 +269,18 @@ export const Gallery: FC<GalleryProps> = () => {
           <button
             className={`bg-transparent border-none font-mono text-sm font-semibold tracking-wider cursor-pointer transition-all duration-300 py-2 px-0 relative ${
               sortOrder === "alphabetically"
-                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f] after:animate-[slideIn_0.3s_ease]'
+                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f]'
                 : "text-white/50 hover:text-white/90"
             }`}
             onClick={() => setSortOrder("alphabetically")}
           >
             ALPHABETICALLY
           </button>
+
           <button
             className={`bg-transparent border-none font-mono text-sm font-semibold tracking-wider cursor-pointer transition-all duration-300 py-2 px-0 relative ${
               sortOrder === "randomly"
-                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f] after:animate-[slideIn_0.3s_ease]'
+                ? 'text-[#f4d03f] after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#f4d03f]'
                 : "text-white/50 hover:text-white/90"
             }`}
             onClick={() => {
@@ -354,7 +297,7 @@ export const Gallery: FC<GalleryProps> = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 md:gap-8 animate-[fadeIn_0.6s_ease]">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 md:gap-8">
         {allItems.map((item, index) => {
           const gridCols =
             window.innerWidth < 768 ? 1 : Math.floor(window.innerWidth / 360);
@@ -362,8 +305,8 @@ export const Gallery: FC<GalleryProps> = () => {
           const row = Math.floor(index / gridCols);
           const cardWidth = window.innerWidth < 768 ? 280 : 320;
           const gap = window.innerWidth < 768 ? 24 : 32;
-
           const gridWidth = gridCols * cardWidth + (gridCols - 1) * gap;
+
           const centerX =
             gridWidth / 2 - (col * (cardWidth + gap) + cardWidth / 2);
           const centerY =
@@ -392,7 +335,21 @@ export const Gallery: FC<GalleryProps> = () => {
                   flippedCards.has(item.id) ? "flipped" : ""
                 }`}
               >
-                <div className="card-face">
+                <div
+                  className={`card-face ${
+                    item.type === "building" && !flippedCards.has(item.id)
+                      ? "cursor-pointer"
+                      : "cursor-default"
+                  }`}
+                  onClick={() => {
+                    if (
+                      item.type === "building" &&
+                      !flippedCards.has(item.id)
+                    ) {
+                      navigate(`/building/${item.id}`);
+                    }
+                  }}
+                >
                   <div className="w-full h-full relative">
                     {item.type === "building" ? (
                       <img
@@ -448,14 +405,14 @@ export const Gallery: FC<GalleryProps> = () => {
                     )}
 
                     <div className="absolute inset-0 flex flex-col justify-end p-6 pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-400">
-                      <h3 className="text-2xl font-bold text-white m-0 leading-tight capitalize drop-shadow-[2px_2px_12px_rgba(0,0,0,0.9)] transition-all duration-400 pointer-events-auto">
+                      <h3 className="text-2xl font-bold text-white m-0 leading-tight capitalize drop-shadow-[2px_2px_12px_rgba(0,0,0,0.9)]">
                         {item.name}
                       </h3>
                     </div>
 
                     {item.type === "building" && (
                       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 flex flex-col justify-between p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-400">
-                        <div className="translate-y-0 md:translate-y-2.5 group-hover:translate-y-0 transition-transform duration-400">
+                        <div>
                           <span className="inline-block text-xs text-[#f4d03f] uppercase tracking-[0.1em] mb-2 font-semibold">
                             📍 {item.totalImages}{" "}
                             {item.totalImages === 1 ? "photo" : "photos"}
@@ -464,21 +421,15 @@ export const Gallery: FC<GalleryProps> = () => {
                             {item.name}
                           </h3>
                         </div>
+
                         <button
-                          className="flex items-center gap-2 bg-white text-[#0a0a0a] border-none py-3 px-5 font-mono text-xs font-bold tracking-[0.1em] cursor-pointer transition-all duration-300 translate-y-0 opacity-100 md:translate-y-2.5 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 rounded-sm hover:bg-[#f4d03f] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(244,208,63,0.4)] delay-100"
+                          className="flex items-center gap-2 bg-white text-[#0a0a0a] border-none py-3 px-5 font-mono text-xs font-bold tracking-[0.1em] cursor-pointer transition-all duration-300 rounded-sm hover:bg-[#f4d03f]"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleExplore(item);
                           }}
                         >
                           EXPLORE
-                          <svg
-                            className="w-4 h-4"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                          >
-                            <path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z" />
-                          </svg>
                         </button>
                       </div>
                     )}
@@ -529,7 +480,7 @@ export const Gallery: FC<GalleryProps> = () => {
 
                         <div className="absolute bottom-4 left-4">
                           <button
-                            className="flex items-center gap-2 bg-white text-[#0a0a0a] border-none py-2 px-4 font-mono text-xs font-bold tracking-[0.1em] cursor-pointer rounded-sm hover:bg-[#f4d03f] transition-all duration-300 shadow-lg"
+                            className="flex items-center gap-2 bg-white text-[#0a0a0a] border-none py-2 px-4 font-mono text-xs font-bold tracking-[0.1em] cursor-pointer rounded-sm hover:bg-[#f4d03f]"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleExplore(item);
@@ -541,14 +492,12 @@ export const Gallery: FC<GalleryProps> = () => {
                       </>
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#0a0a0a] to-[#1a1410]">
-                        <div className="text-center mb-4">
-                          <h3 className="text-xl font-bold text-white mb-2 capitalize">
-                            {item.name}
-                          </h3>
-                          <p className="text-sm text-white/60">
-                            No coordinates available
-                          </p>
-                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2 capitalize">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-white/60 mb-4">
+                          No coordinates available
+                        </p>
 
                         <div className="w-full h-64 bg-black/30 rounded border border-white/10 flex items-center justify-center">
                           <svg
@@ -561,7 +510,7 @@ export const Gallery: FC<GalleryProps> = () => {
                         </div>
 
                         <button
-                          className="mt-6 flex items-center gap-2 bg-white text-[#0a0a0a] border-none py-3 px-5 font-mono text-xs font-bold tracking-[0.1em] cursor-pointer rounded-sm hover:bg-[#f4d03f] transition-all duration-300"
+                          className="mt-6 flex items-center gap-2 bg-white text-[#0a0a0a] border-none py-3 px-5 font-mono text-xs font-bold tracking-[0.1em]"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleExplore(item);
@@ -628,6 +577,7 @@ export const Gallery: FC<GalleryProps> = () => {
           </div>
         </div>
       )}
+
       <style dangerouslySetInnerHTML={{ __html: styles }} />
     </div>
   );
