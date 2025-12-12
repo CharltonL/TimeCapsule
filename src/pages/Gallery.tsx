@@ -170,11 +170,9 @@ export const Gallery: FC<GalleryProps> = () => {
   };
 
   useEffect(() => {
-    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
     Object.values(imageModules).forEach((url) => {
-      const cleanUrl = url.toString().replace(/^\//, "");
       const img = new Image();
-      img.src = `${base}${cleanUrl}`;
+      img.src = url as string; // Already correct!
     });
   }, []);
 

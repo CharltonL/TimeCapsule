@@ -10,10 +10,7 @@ export const HomePage: FC<HomePageProps> = () => {
   );
 
   const images = Object.values(imageModules)
-    .map((url) => {
-      // `url` will be something like "/images/xxx.png" in dev and build
-      return `${import.meta.env.BASE_URL}${url.toString().replace(/^\//, "")}`;
-    })
+    .map((url) => url as string)
     .sort(() => Math.random() - 0.5);
 
   return (
