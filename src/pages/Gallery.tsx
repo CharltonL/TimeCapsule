@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import type { FC } from "react";
-import OSMap, { type MapPoint } from "../components/OSMap";
+import OSMap from "../components/OSMap";
 
 type FilterType = "all" | "buildings" | "interviews";
 type SortOrderType = "alphabetically" | "randomly";
