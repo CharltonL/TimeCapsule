@@ -1,6 +1,6 @@
 import React, { type JSX } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { GLOBE_ICON, MAP_ICON } from "./Icons";
+import { GLOBE_ICON, MAP_ICON, GALLERY_ICON, HOME_ICON } from "./Icons";
 
 interface SidebarItem {
   path: string;
@@ -12,21 +12,12 @@ const sidebarItems: SidebarItem[] = [
   {
     path: "/",
     label: "Home",
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-        />
-      </svg>
-    ),
+    icon: HOME_ICON,
+  },
+  {
+    path: "/gallery",
+    label: "Gallery",
+    icon: GALLERY_ICON,
   },
   {
     path: "/map",
@@ -66,14 +57,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       <div className="flex flex-col h-full">
         <div className={`flex items-center justify-between  h-16 `}>
-          {/* <div
-          className={`flex items-center justify-between ${
-            drawerOpen ? "p-4" : "p-0"
-          } border-b border-gray-700 h-16 overflow-hidden`}
-        > */}
           {drawerOpen ? (
             <div className="w-full flex items-center justify-between h-full">
-              {/* <h2 className="text-lg font-semibold bg-red-500">Menu</h2> */}
               <div className="w-full h-full flex items-center justify-center">
                 <img
                   src={`${import.meta.env.BASE_URL}tiger_long.png`}

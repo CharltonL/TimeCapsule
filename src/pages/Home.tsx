@@ -1,26 +1,29 @@
 import type { FC } from "react";
-import { NavLink } from "react-router-dom";
 import Carousel from "../components/Carousel";
 
 export interface HomePageProps {}
 
 export const HomePage: FC<HomePageProps> = () => {
-  const images = Array.from(
-    { length: 9 },
-    (_, i) => `${import.meta.env.BASE_URL}carosel/img${i + 1}.png`
+  const imageModules = import.meta.glob(
+    "/public/images/**/*.(png|jpg|jpeg|gif|webp)",
+    { eager: true }
   );
-
-  const allImages = [...images, ...images, ...images];
+  const images = Object.keys(imageModules)
+    .map((path) => path.replace("/public", ""))
+    .sort(() => Math.random() - 0.5);
 
   return (
-    <div className="flex flex-col items-center w-full bg-amber-200 p-5 h-full overflow-hidden">
-      <div className="h-2/3 ">
-        <Carousel logos={allImages.map((link) => ({ link }))} />
+    <div className="flex flex-col items-center w-full p-5 h-full overflow-hidden">
+      <h1 className={`text-3xl text-white`}>
+        The RIT Fall 2025 Time Capsule attempts to preserve RIT as it existed
+        during Fall 2025. Through campus photography, interviews, and 360°
+        tours, the project captures not just what the campus looked like, but
+        how it felt to be here, documenting the spaces we inhabited and the
+        stories we shared during this semester.
+      </h1>
+      <div className="h-full">
+        <Carousel logos={images.map((link) => ({ link }))} />
       </div>
-
-      <NavLink to="/page2" className="text-blue-600 hover:underline text-lg">
-        Go to Page 2
-      </NavLink>
     </div>
   );
 };

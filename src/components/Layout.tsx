@@ -6,7 +6,6 @@ import Sidebar from "./Sidebar";
 export const Layout: React.FC = () => {
   const mainContainerRef = useRef<HTMLDivElement>(null);
 
-  // Initialize sidebar state from localStorage, default to true (open)
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -15,7 +14,6 @@ export const Layout: React.FC = () => {
   };
 
   useEffect(() => {
-    // Example: fake initial load; replace with real init/fetch
     const timer = setTimeout(() => {
       setLoading(false);
     }, 800);
@@ -34,7 +32,6 @@ export const Layout: React.FC = () => {
           <div className="border-t border-gray-700 p-6 h-full">
             {loading ? (
               <div className="flex items-center justify-center h-full">
-                {/* Your loading screen / spinner */}
                 <div className="flex flex-col items-center gap-4">
                   <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-500 border-t-transparent" />
                   <p className="text-gray-300">Loading…</p>
