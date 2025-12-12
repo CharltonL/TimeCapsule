@@ -5,7 +5,7 @@ export interface HomePageProps {}
 
 export const HomePage: FC<HomePageProps> = () => {
   const imageModules = import.meta.glob(
-    "/public/images/**/*.(png|jpg|jpeg|gif|webp)",
+    `${import.meta.env.BASE_URL}images/**/*.(png|jpg|jpeg|gif|webp)`,
     { eager: true }
   );
   const images = Object.keys(imageModules)

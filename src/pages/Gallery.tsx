@@ -138,9 +138,12 @@ export const Gallery: FC<GalleryProps> = () => {
     { eager: true }
   );
 
-  const interviewModules = import.meta.glob("/public/interviews/*.(mp4|mov)", {
-    eager: true,
-  });
+  const interviewModules = import.meta.glob(
+    `${import.meta.env.BASE_URL}interviews/*.(mp4|mov)`,
+    {
+      eager: true,
+    }
+  );
 
   const buildingData = useMemo<BuildingItem[]>(() => {
     const buildings: Record<string, string[]> = {};
